@@ -1,0 +1,376 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 045192f88b4589143af82175de75c641, type: 3}
+  m_Name: List 1 Sprite
+  m_EditorClassIdentifier: Assembly-CSharp::SpriteItemList
+  items:
+  - itemID: 0
+    itemName: Unknown bottel
+    sprite: {fileID: 21300000, guid: 33f7369696eacbc45ab2d9fbb8c89051, type: 2}
+  - itemID: 1
+    itemName: Pink
+    sprite: {fileID: 21300000, guid: 98a13438b14f9d74a8e8b489fe648767, type: 2}
+  - itemID: 2
+    itemName: green bottle
+    sprite: {fileID: 21300000, guid: eaf96f212ea18a4469a05813459253f1, type: 2}
+  - itemID: 3
+    itemName: Blue Bottel
+    sprite: {fileID: 21300000, guid: c577ac607699a7543a232ade87920b93, type: 2}
+  - itemID: 4
+    itemName: Bottle
+    sprite: {fileID: 21300000, guid: 4cdc23d9e464db64d9dbe673c1cbd008, type: 2}
+  - itemID: 5
+    itemName: Beer1
+    sprite: {fileID: 21300000, guid: a5f8cc90abcb7cc4a8f2ef865d8eddd1, type: 2}
+  - itemID: 6
+    itemName: Beer2
+    sprite: {fileID: 21300000, guid: a4d0302c0f9544247ad995ef12610a17, type: 2}
+  - itemID: 7
+    itemName: beer3
+    sprite: {fileID: 21300000, guid: 41bd62e7f98b53d48a169599a931e39a, type: 2}
+  - itemID: 8
+    itemName: beer4
+    sprite: {fileID: 21300000, guid: d34a7faa662b35442acf3013c9d11fee, type: 2}
+  - itemID: 9
+    itemName: Beer5
+    sprite: {fileID: 21300000, guid: a197a20c9aebfa74e892d501f702ddca, type: 2}
+  - itemID: 10
+    itemName: Beer6
+    sprite: {fileID: 21300000, guid: 77a0867f73e926e4bb35e00ecd3a3f86, type: 2}
+  - itemID: 11
+    itemName: smi_beizi2_4
+    sprite: {fileID: 21300000, guid: 403b654ea1909934999f63b84bf4ffa8, type: 2}
+  - itemID: 12
+    itemName: UNknow
+    sprite: {fileID: 21300000, guid: 514e1221f334aae4896250ebcb04df6f, type: 2}
+  - itemID: 13
+    itemName: smi_beizi3_1
+    sprite: {fileID: 21300000, guid: 0ad22e5fdbde4d44bab6aa2e4840b9e1, type: 2}
+  - itemID: 14
+    itemName: smi_beizi3_2
+    sprite: {fileID: 21300000, guid: d2a8923850845e1438f07a3c0ad11e45, type: 2}
+  - itemID: 15
+    itemName: smi_beizi3_3
+    sprite: {fileID: 21300000, guid: d1dcb0878cb86a140b6faf07327e3932, type: 2}
+  - itemID: 16
+    itemName: smi_beizi3_4
+    sprite: {fileID: 21300000, guid: db104900898d6524da3ee3f0bba0f0b0, type: 2}
+  - itemID: 17
+    itemName: smi_beizi4_0
+    sprite: {fileID: 21300000, guid: aabd69e9a8315684c98a46f284d152c4, type: 2}
+  - itemID: 18
+    itemName: smi_beizi4_1
+    sprite: {fileID: 21300000, guid: d48c7d55a3f97b245b0a5fa24cfbe8d2, type: 2}
+  - itemID: 19
+    itemName: smi_beizi4_2
+    sprite: {fileID: 21300000, guid: 75714aaa26b7e8c4a86cf3de068fb0b1, type: 2}
+  - itemID: 20
+    itemName: smi_beizi4_3
+    sprite: {fileID: 21300000, guid: 203deda781d652342ae0cb59fb1f5660, type: 2}
+  - itemID: 21
+    itemName: smi_beizi4_4
+    sprite: {fileID: 21300000, guid: 6e453088c484c70428f34c651b4b84c3, type: 2}
+  - itemID: 22
+    itemName: smi_beizi5_0
+    sprite: {fileID: 21300000, guid: 561f39803c46e534e974f000235a301a, type: 2}
+  - itemID: 23
+    itemName: smi_beizi5_1
+    sprite: {fileID: 21300000, guid: 5612b1d694dc70142a79830df2bfcc3f, type: 2}
+  - itemID: 24
+    itemName: smi_beizi5_2
+    sprite: {fileID: 21300000, guid: 8b98b4d22a073d544a98d081d1bc0115, type: 2}
+  - itemID: 25
+    itemName: smi_beizi5_3
+    sprite: {fileID: 21300000, guid: b970a0e546c74124cbb384a54c01a44b, type: 2}
+  - itemID: 26
+    itemName: smi_beizi5_4
+    sprite: {fileID: 21300000, guid: 301dbb7caca9a324284199edcb84b85d, type: 2}
+  - itemID: 27
+    itemName: smi_beizi6_0
+    sprite: {fileID: 21300000, guid: 617a58d18ae5d3f48bfd58cfadfbf97e, type: 2}
+  - itemID: 28
+    itemName: smi_beizi6_1
+    sprite: {fileID: 21300000, guid: 44416c564f9f7cf4691d770a9c1f0c81, type: 2}
+  - itemID: 29
+    itemName: smi_beizi6_2
+    sprite: {fileID: 21300000, guid: 0f5b9bb54a488354e9125581c868360e, type: 2}
+  - itemID: 30
+    itemName: smi_beizi6_3
+    sprite: {fileID: 21300000, guid: 280466a4fc9da114c8d056fd58d9be8e, type: 2}
+  - itemID: 31
+    itemName: smi_beizi6_4
+    sprite: {fileID: 21300000, guid: 9ce8054dffa24754facf9770bcd15cee, type: 2}
+  - itemID: 32
+    itemName: smi_beizi7_0
+    sprite: {fileID: 21300000, guid: e9adaa9215a215f40b0cf7024ed57115, type: 2}
+  - itemID: 33
+    itemName: smi_beizi7_1
+    sprite: {fileID: 21300000, guid: 05e0d06f52a3eee44886b4bb7c46cf67, type: 2}
+  - itemID: 34
+    itemName: smi_beizi7_2
+    sprite: {fileID: 21300000, guid: 182517d2c7938d9459993482e33b03bc, type: 2}
+  - itemID: 35
+    itemName: smi_beizi7_3
+    sprite: {fileID: 21300000, guid: 6148883f80f2d0244b54c4d867a1cb9c, type: 2}
+  - itemID: 36
+    itemName: smi_beizi7_4
+    sprite: {fileID: 21300000, guid: ee828910461762b4faf267e7d22ab6d3, type: 2}
+  - itemID: 37
+    itemName: smi_beizi7_5
+    sprite: {fileID: 21300000, guid: 744126ae90535084c8366e745c1befd4, type: 2}
+  - itemID: 38
+    itemName: smi_beizi8_0
+    sprite: {fileID: 21300000, guid: 770f859376dd73347a448392c09902ef, type: 2}
+  - itemID: 39
+    itemName: smi_beizi8_1
+    sprite: {fileID: 21300000, guid: 19e46f09f500849448d68c1f68a83800, type: 2}
+  - itemID: 40
+    itemName: smi_beizi8_2
+    sprite: {fileID: 21300000, guid: 76dab5998cffeac4d9300cfb7c699cee, type: 2}
+  - itemID: 41
+    itemName: smi_beizi8_3
+    sprite: {fileID: 21300000, guid: 1303d5f4acc84c7479d2bdad7c4ec4dc, type: 2}
+  - itemID: 42
+    itemName: smi_beizi8_4
+    sprite: {fileID: 21300000, guid: 2164932a2f2a5bf44827f8fdc12a7944, type: 2}
+  - itemID: 43
+    itemName: smi_beizi9_0
+    sprite: {fileID: 21300000, guid: df22b4893b3ee3a498ac163584dc90a2, type: 2}
+  - itemID: 44
+    itemName: smi_beizi9_1
+    sprite: {fileID: 21300000, guid: 996bd9fe9882bef489bbe5e0e7b216b6, type: 2}
+  - itemID: 45
+    itemName: smi_beizi9_2
+    sprite: {fileID: 21300000, guid: 4ccc298890062ef41bf98681c629248d, type: 2}
+  - itemID: 46
+    itemName: smi_beizi9_3
+    sprite: {fileID: 21300000, guid: c5694edb6a3f1ca4889609f21e1f5767, type: 2}
+  - itemID: 47
+    itemName: smi_beizi9_4
+    sprite: {fileID: 21300000, guid: 72469f3ab9a4fb04babff973d3f21f88, type: 2}
+  - itemID: 48
+    itemName: smi_beizi9_5
+    sprite: {fileID: 21300000, guid: 4445ad535314cda48ab210f3a9e50ae3, type: 2}
+  - itemID: 49
+    itemName: smi_beizi10_0
+    sprite: {fileID: 21300000, guid: 437d7a5de1526f04c9591f36e6de4121, type: 2}
+  - itemID: 50
+    itemName: smi_beizi10_1
+    sprite: {fileID: 21300000, guid: 102a40a361f12a0459ae7b27e26782ba, type: 2}
+  - itemID: 51
+    itemName: smi_beizi10_2
+    sprite: {fileID: 21300000, guid: ce38be976d216124896395b9a5dee41f, type: 2}
+  - itemID: 52
+    itemName: smi_beizi10_3
+    sprite: {fileID: 21300000, guid: 2b60306c52de99c479b718230e812e09, type: 2}
+  - itemID: 53
+    itemName: smi_beizi10_4
+    sprite: {fileID: 21300000, guid: b9c28c8b3c61e9649b88bcd2fd86b90f, type: 2}
+  - itemID: 54
+    itemName: smi_beizi11_0
+    sprite: {fileID: 21300000, guid: 02ebf7dc4d08ec3418d3bc94cbfb7258, type: 2}
+  - itemID: 55
+    itemName: smi_beizi11_1
+    sprite: {fileID: 21300000, guid: 90248607958358e4e88d1160b6e4dddc, type: 2}
+  - itemID: 56
+    itemName: smi_beizi11_2
+    sprite: {fileID: 21300000, guid: 9118108c602f29146bc93fef644e2ad5, type: 2}
+  - itemID: 57
+    itemName: smi_beizi11_3
+    sprite: {fileID: 21300000, guid: 12bf22598e48a81469523987178673d0, type: 2}
+  - itemID: 58
+    itemName: smi_beizi11_4
+    sprite: {fileID: 21300000, guid: b27374af4a25af941bfc6b60c2d9d648, type: 2}
+  - itemID: 59
+    itemName: smi_beizi12_0
+    sprite: {fileID: 21300000, guid: 280b0bf8fad8d5e4b825c880354f907c, type: 2}
+  - itemID: 60
+    itemName: smi_beizi13_2
+    sprite: {fileID: 21300000, guid: c20617c3c64f30f40b02029df146cb86, type: 2}
+  - itemID: 61
+    itemName: smi_beizi13_3
+    sprite: {fileID: 21300000, guid: 0f0b149ba817a1545b5417efe8fef4b0, type: 2}
+  - itemID: 62
+    itemName: smi_beizi13_4
+    sprite: {fileID: 21300000, guid: d25bfe9adbdb3fc4fa27177860460021, type: 2}
+  - itemID: 63
+    itemName: smi_beizi13_5
+    sprite: {fileID: 21300000, guid: b11ef9d6fee42c24787dd7e562157807, type: 2}
+  - itemID: 64
+    itemName: smi_beizi14_0
+    sprite: {fileID: 21300000, guid: dc9f75f09c9ba294bba3476fdeef5e23, type: 2}
+  - itemID: 65
+    itemName: smi_beizi14_1
+    sprite: {fileID: 21300000, guid: 68370ed274b8fef43aa29e62264b7fd1, type: 2}
+  - itemID: 66
+    itemName: smi_beizi14_2
+    sprite: {fileID: 21300000, guid: 402105cba1958fe4cbeca2eba31c89e8, type: 2}
+  - itemID: 67
+    itemName: smi_beizi14_3
+    sprite: {fileID: 21300000, guid: 96dfba055c02aa74c9a28ae3d49ee5cd, type: 2}
+  - itemID: 68
+    itemName: smi_beizi14_4
+    sprite: {fileID: 21300000, guid: 50fa677a4fd8f4a489b93a5f7bc6a3aa, type: 2}
+  - itemID: 69
+    itemName: smi_beizi14_5
+    sprite: {fileID: 21300000, guid: 8559b76f214cae749bd35826b7307698, type: 2}
+  - itemID: 70
+    itemName: smi_beizi14_6
+    sprite: {fileID: 21300000, guid: c84c447b06e4bfe4b8815fbc2dbddd64, type: 2}
+  - itemID: 71
+    itemName: smi_dai1_0
+    sprite: {fileID: 21300000, guid: af443c0989aff194aa2ab34c35d37d34, type: 2}
+  - itemID: 72
+    itemName: smi_dai1_2
+    sprite: {fileID: 21300000, guid: 2e8ba37bd2304c04c85fb6ed1a70c1b4, type: 2}
+  - itemID: 73
+    itemName: smi_dai1_3
+    sprite: {fileID: 21300000, guid: bbc9867835b7e384b9a0326a10e0b5de, type: 2}
+  - itemID: 74
+    itemName: smi_dai1_4
+    sprite: {fileID: 21300000, guid: 5249f476522b35a41b2b23c99e5b735f, type: 2}
+  - itemID: 75
+    itemName: smi_dai2_0
+    sprite: {fileID: 21300000, guid: 3bd0e319c7cea06428abd787b729a979, type: 2}
+  - itemID: 76
+    itemName: smi_dai2_1
+    sprite: {fileID: 21300000, guid: 127b99331d934b94bbaecffb823908ec, type: 2}
+  - itemID: 77
+    itemName: smi_dai2_2
+    sprite: {fileID: 21300000, guid: cfbf89dc0de189941aca4e97e55e2adb, type: 2}
+  - itemID: 78
+    itemName: smi_dai2_3
+    sprite: {fileID: 21300000, guid: e0143c4c3974e154eaaf794b5853a9a4, type: 2}
+  - itemID: 79
+    itemName: smi_dai3_0
+    sprite: {fileID: 21300000, guid: 61852efcb29a0ce499bc31552d045991, type: 2}
+  - itemID: 80
+    itemName: smi_dai3_1
+    sprite: {fileID: 21300000, guid: 7cda077e5d8e1bd4f85bf7040f292b7a, type: 2}
+  - itemID: 81
+    itemName: smi_dai3_2
+    sprite: {fileID: 21300000, guid: 96edf59d369b69f4fa26121861950bdc, type: 2}
+  - itemID: 82
+    itemName: smi_dai3_3
+    sprite: {fileID: 21300000, guid: 7b15d14e7250e2b40a90d5bfbfe363c1, type: 2}
+  - itemID: 83
+    itemName: smi_dai3_4
+    sprite: {fileID: 21300000, guid: 69d180cdcc9d4b4459f57c485aefa352, type: 2}
+  - itemID: 84
+    itemName: smi_dai4_0
+    sprite: {fileID: 21300000, guid: fe25dd14bd010c94d961dc2417c5ced7, type: 2}
+  - itemID: 85
+    itemName: smi_dai4_1
+    sprite: {fileID: 21300000, guid: 5f8c45c223e9da841af4369323ac5123, type: 2}
+  - itemID: 86
+    itemName: smi_dai4_2
+    sprite: {fileID: 21300000, guid: 28bf502034af6724187da4d0fbeac27d, type: 2}
+  - itemID: 87
+    itemName: smi_dai4_3
+    sprite: {fileID: 21300000, guid: 1f02108fe2b187a49b514a064a2357e2, type: 2}
+  - itemID: 88
+    itemName: smi_dai4_4
+    sprite: {fileID: 21300000, guid: aa6aa0f04e43b264db49298637294a79, type: 2}
+  - itemID: 89
+    itemName: smi_dai4_5
+    sprite: {fileID: 21300000, guid: 8bf071b264d232c40990654a59d9dea6, type: 2}
+  - itemID: 90
+    itemName: smi_dai5_0
+    sprite: {fileID: 21300000, guid: 5fdbb61e0695071478f786cbbc0f7ba5, type: 2}
+  - itemID: 91
+    itemName: smi_dai5_1
+    sprite: {fileID: 21300000, guid: 54d5db62de9c5784f8025e2b361be7cb, type: 2}
+  - itemID: 92
+    itemName: smi_dai5_2
+    sprite: {fileID: 21300000, guid: ddfac6b50798ba64fb3c75d292df6b34, type: 2}
+  - itemID: 93
+    itemName: smi_dai5_3
+    sprite: {fileID: 21300000, guid: 8abfb21cc6571c84284c42ecb0e8b32b, type: 2}
+  - itemID: 94
+    itemName: smi_dai5_4
+    sprite: {fileID: 21300000, guid: c30bf8450b943984b8d1ada6c45e2fa6, type: 2}
+  - itemID: 95
+    itemName: smi_dai5_5
+    sprite: {fileID: 21300000, guid: deab8d43050f53846aaba02b3d865e1b, type: 2}
+  - itemID: 96
+    itemName: smi_dai6_0
+    sprite: {fileID: 21300000, guid: 47f801d30c85c4847b4c573a7e1d948e, type: 2}
+  - itemID: 97
+    itemName: smi_dai6_1
+    sprite: {fileID: 21300000, guid: f3a5e8b67abb9a74fbb7a870d8331f5c, type: 2}
+  - itemID: 98
+    itemName: smi_dai6_2
+    sprite: {fileID: 21300000, guid: 8776167703f65a042b7191f6fce47cc2, type: 2}
+  - itemID: 99
+    itemName: smi_dai6_3
+    sprite: {fileID: 21300000, guid: 2c560182e350ae446adefc3c316639ec, type: 2}
+  - itemID: 100
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  - itemID: 101
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  - itemID: 102
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  - itemID: 103
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  - itemID: 104
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  - itemID: 105
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  - itemID: 106
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  - itemID: 107
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  - itemID: 108
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  - itemID: 109
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  - itemID: 110
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  - itemID: 111
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  - itemID: 112
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  - itemID: 113
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  - itemID: 114
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  - itemID: 115
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  - itemID: 116
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  - itemID: 117
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  - itemID: 118
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  - itemID: 119
+    itemName: smi_dai6_4
+    sprite: {fileID: 21300000, guid: fd6ec8cee9e06b94eb5c51a5659c8650, type: 2}
+  baseItemPrefab: {fileID: 3116210001917478845, guid: bbf1d9dd5e399934ca4692b6a282616f, type: 3}

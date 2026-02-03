@@ -1091,7 +1091,7 @@ Transform:
   m_GameObject: {fileID: 1387747317482571}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1, z: 0}
+  m_LocalPosition: {x: -0.5, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1376,10 +1376,10 @@ MonoBehaviour:
   maxItems: 3
   itemContainer: {fileID: 4039137798611744}
   maxLayers: 3
-  startSpot: {fileID: 0}
-  spotSpacing: 0.6
+  startSpot: {fileID: 4039137798611744}
+  spotSpacing: 1
   arrangeHorizontal: 1
-  tiltItems: 1
+  tiltItems: 0
   tiltAngleX: 15
   highlightObject: {fileID: 0}
   validDropColor: {r: 0, g: 1, b: 0, a: 1}

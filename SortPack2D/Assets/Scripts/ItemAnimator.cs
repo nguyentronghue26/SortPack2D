@@ -43,26 +43,32 @@ public class ItemAnimator : MonoBehaviour
     {
         originalScale = transform.localScale;
         originalPosition = transform.localPosition;
-
-        // Không gọi idle animation
+        // Không auto idle
     }
 
     void OnDestroy()
     {
-        // Kill all tweens on this object
         transform.DOKill();
     }
 
     // ========== PICK UP ==========
     public void PlayPickUp()
     {
-        // Không làm gì - giữ nguyên bình thường
+        // Nếu sau này muốn có hiệu ứng nhấc lên, nhớ dùng scale hiện tại làm gốc:
+        // transform.DOKill();
+        // Vector3 baseScale = transform.localScale;
+        // transform.DOScale(baseScale * pickUpScale, pickUpDuration)
+        //          .SetEase(pickUpEase);
     }
 
-    // ========== DROP ==========
+    // ========== DROP (CÓ DI CHUYỂN) ==========
     public void PlayDrop(Vector3 targetPosition, System.Action onComplete = null)
     {
         transform.DOKill();
+
+        // *** LẤY SCALE HIỆN TẠI LÀM GỐC ***
+        originalScale = transform.localScale;
+        originalPosition = transform.localPosition;
 
         Sequence dropSequence = DOTween.Sequence();
 
@@ -74,14 +80,24 @@ public class ItemAnimator : MonoBehaviour
 
         // Squash khi chạm
         dropSequence.Append(
-            transform.DOScale(new Vector3(originalScale.x * 1.2f, originalScale.y * squashScaleY, originalScale.z), dropDuration * 0.15f)
-                .SetEase(Ease.OutQuad)
+            transform.DOScale(
+                new Vector3(
+                    originalScale.x * 1.2f,
+                    originalScale.y * squashScaleY,
+                    originalScale.z),
+                dropDuration * 0.15f
+            ).SetEase(Ease.OutQuad)
         );
 
         // Stretch lên
         dropSequence.Append(
-            transform.DOScale(new Vector3(originalScale.x * 0.9f, originalScale.y * stretchScaleY, originalScale.z), dropDuration * 0.15f)
-                .SetEase(Ease.OutQuad)
+            transform.DOScale(
+                new Vector3(
+                    originalScale.x * 0.9f,
+                    originalScale.y * stretchScaleY,
+                    originalScale.z),
+                dropDuration * 0.15f
+            ).SetEase(Ease.OutQuad)
         );
 
         // Về scale gốc với bounce
@@ -90,32 +106,46 @@ public class ItemAnimator : MonoBehaviour
                 .SetEase(Ease.OutBounce)
         );
 
-        dropSequence.OnComplete(() => {
+        dropSequence.OnComplete(() =>
+        {
             onComplete?.Invoke();
             if (enableIdleAnimation) StartIdleAnimation();
         });
     }
 
-    // ========== DROP SIMPLE (không di chuyển) ==========
+    // ========== DROP SIMPLE (KHÔNG DI CHUYỂN) ==========
     public void PlayDropBounce()
     {
         transform.DOKill();
+
+        // *** LẤY SCALE HIỆN TẠI LÀM GỐC ***
+        originalScale = transform.localScale;
 
         Sequence bounceSequence = DOTween.Sequence();
 
         // Squash
         bounceSequence.Append(
-            transform.DOScale(new Vector3(originalScale.x * 1.15f, originalScale.y * squashScaleY, originalScale.z), 0.1f)
-                .SetEase(Ease.OutQuad)
+            transform.DOScale(
+                new Vector3(
+                    originalScale.x * 1.15f,
+                    originalScale.y * squashScaleY,
+                    originalScale.z),
+                0.1f
+            ).SetEase(Ease.OutQuad)
         );
 
         // Stretch
         bounceSequence.Append(
-            transform.DOScale(new Vector3(originalScale.x * 0.92f, originalScale.y * stretchScaleY, originalScale.z), 0.1f)
-                .SetEase(Ease.OutQuad)
+            transform.DOScale(
+                new Vector3(
+                    originalScale.x * 0.92f,
+                    originalScale.y * stretchScaleY,
+                    originalScale.z),
+                0.1f
+            ).SetEase(Ease.OutQuad)
         );
 
-        // Back to normal - không gọi idle animation
+        // Back to normal
         bounceSequence.Append(
             transform.DOScale(originalScale, 0.15f)
                 .SetEase(Ease.OutBounce)
@@ -127,6 +157,9 @@ public class ItemAnimator : MonoBehaviour
     {
         transform.DOKill();
 
+        // *** BASE SCALE HIỆN TẠI ***
+        originalScale = transform.localScale;
+
         Sequence mergeSequence = DOTween.Sequence();
 
         // Bay về trung tâm + xoay + scale up
@@ -136,7 +169,10 @@ public class ItemAnimator : MonoBehaviour
         );
 
         mergeSequence.Join(
-            transform.DORotate(new Vector3(0, 0, mergeRotation), mergeDuration * 0.6f, RotateMode.FastBeyond360)
+            transform.DORotate(
+                new Vector3(0, 0, mergeRotation),
+                mergeDuration * 0.6f,
+                RotateMode.FastBeyond360)
                 .SetEase(Ease.InQuad)
         );
 
@@ -151,15 +187,15 @@ public class ItemAnimator : MonoBehaviour
                 .SetEase(mergeEase)
         );
 
-        mergeSequence.OnComplete(() => {
-            onComplete?.Invoke();
-        });
+        mergeSequence.OnComplete(() => { onComplete?.Invoke(); });
     }
 
-    // ========== MERGE SIMPLE (chỉ scale và fade) ==========
+    // ========== MERGE SIMPLE ==========
     public void PlayMergeSimple(System.Action onComplete = null)
     {
         transform.DOKill();
+
+        originalScale = transform.localScale;
 
         Sequence mergeSequence = DOTween.Sequence();
 
@@ -181,9 +217,7 @@ public class ItemAnimator : MonoBehaviour
                 .SetEase(mergeEase)
         );
 
-        mergeSequence.OnComplete(() => {
-            onComplete?.Invoke();
-        });
+        mergeSequence.OnComplete(() => { onComplete?.Invoke(); });
     }
 
     // ========== IDLE ANIMATION ==========
@@ -193,13 +227,14 @@ public class ItemAnimator : MonoBehaviour
 
         idleTween?.Kill();
 
-        // Subtle bounce
+        originalPosition = transform.localPosition;
+
         idleTween = transform.DOLocalMoveY(
-            originalPosition.y + idleBounceAmount,
-            idleBounceDuration
-        )
-        .SetEase(Ease.InOutSine)
-        .SetLoops(-1, LoopType.Yoyo);
+                originalPosition.y + idleBounceAmount,
+                idleBounceDuration
+            )
+            .SetEase(Ease.InOutSine)
+            .SetLoops(-1, LoopType.Yoyo);
     }
 
     public void StopIdleAnimation()
@@ -208,17 +243,19 @@ public class ItemAnimator : MonoBehaviour
         transform.localPosition = originalPosition;
     }
 
-    // ========== HOVER (khi drag qua) ==========
+    // ========== HOVER ==========
     public void PlayHoverEnter()
     {
         hoverTween?.Kill();
 
+        originalPosition = transform.localPosition;
+
         hoverTween = transform.DOLocalMoveY(
-            transform.localPosition.y + hoverFloatAmount,
-            hoverFloatDuration
-        )
-        .SetEase(Ease.OutQuad)
-        .SetLoops(-1, LoopType.Yoyo);
+                transform.localPosition.y + hoverFloatAmount,
+                hoverFloatDuration
+            )
+            .SetEase(Ease.OutQuad)
+            .SetLoops(-1, LoopType.Yoyo);
     }
 
     public void PlayHoverExit()
@@ -228,25 +265,40 @@ public class ItemAnimator : MonoBehaviour
             .SetEase(Ease.OutQuad);
     }
 
-    // ========== SHAKE (invalid drop) ==========
+    // ========== SHAKE ==========
     public void PlayShake()
     {
         transform.DOKill();
 
-        transform.DOShakePosition(shakeDuration, shakeStrength, 20, 90, false, true)
-            .OnComplete(() => {
+        transform.DOShakePosition(
+                shakeDuration,
+                shakeStrength,
+                20,
+                90,
+                false,
+                true
+            )
+            .OnComplete(() =>
+            {
                 if (enableIdleAnimation) StartIdleAnimation();
             });
     }
 
-    // ========== SPAWN ANIMATION ==========
+    // ========== SPAWN ==========
     public void PlaySpawn()
     {
+        transform.DOKill();
+
+        // *** DÙNG SCALE HIỆN TẠI LÀ TARGET ***
+        Vector3 targetScale = transform.localScale;
+        originalScale = targetScale;
+
         transform.localScale = Vector3.zero;
 
-        transform.DOScale(originalScale, 0.4f)
+        transform.DOScale(targetScale, 0.4f)
             .SetEase(Ease.OutBack)
-            .OnComplete(() => {
+            .OnComplete(() =>
+            {
                 if (enableIdleAnimation) StartIdleAnimation();
             });
     }
@@ -278,7 +330,8 @@ public class ItemAnimator : MonoBehaviour
                 .SetEase(Ease.OutQuad)
         );
 
-        wobbleSequence.OnComplete(() => {
+        wobbleSequence.OnComplete(() =>
+        {
             if (enableIdleAnimation) StartIdleAnimation();
         });
     }
@@ -292,13 +345,6 @@ public class ItemAnimator : MonoBehaviour
         transform.localRotation = Quaternion.identity;
     }
 
-    public void SetOriginalScale(Vector3 scale)
-    {
-        originalScale = scale;
-    }
-
-    public void SetOriginalPosition(Vector3 position)
-    {
-        originalPosition = position;
-    }
+    public void SetOriginalScale(Vector3 scale) { originalScale = scale; }
+    public void SetOriginalPosition(Vector3 pos) { originalPosition = pos; }
 }
