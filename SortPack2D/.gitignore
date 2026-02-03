@@ -1,0 +1,9 @@
+# Ignore everything
+/*
+
+# But keep the Assets folder
+!Assets/
+!Assets/**
+
+# Keep .gitignore itself
+!.gitignore
