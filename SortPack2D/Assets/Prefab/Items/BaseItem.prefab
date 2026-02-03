@@ -81,7 +81,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: -698000469
-  m_SortingLayer: 1
+  m_SortingLayer: 0
   m_SortingOrder: 21
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -110,7 +110,6 @@ MonoBehaviour:
   itemID: 0
   dragSpeed: 50
   snapSpeed: 20
-  dragZOffset: 0
 --- !u!114 &1670741064143226354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -188,7 +187,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0

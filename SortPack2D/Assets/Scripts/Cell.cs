@@ -25,12 +25,15 @@ public class Cell : MonoBehaviour
     [SerializeField] private Color validDropColor = Color.green;
     [SerializeField] private Color invalidDropColor = Color.red;
 
+    // Spot system
     private Item[] spots;
     private Vector3[] spotPositions;
 
+    // Data
     public int Row { get; set; }
     public int Column { get; set; }
 
+    // Events
     public System.Action<Cell> OnCellFull;
     public System.Action<Cell> OnCellEmpty;
     public System.Action<Cell> OnCellSorted;
@@ -73,15 +76,21 @@ public class Cell : MonoBehaviour
 
         Vector3 startPos = Vector3.zero;
         if (startSpot != null)
+        {
             startPos = startSpot.localPosition;
+        }
 
         for (int i = 0; i < maxItems; i++)
         {
             Vector3 offset = Vector3.zero;
             if (arrangeHorizontal)
+            {
                 offset.x = i * spotSpacing;
+            }
             else
+            {
                 offset.y = -i * spotSpacing;
+            }
 
             spotPositions[i] = startPos + offset;
             spotPositions[i].z = 0f;
@@ -94,12 +103,15 @@ public class Cell : MonoBehaviour
         {
             if (child.name == childName)
                 return child;
+
             Transform found = FindChildRecursive(child, childName);
             if (found != null)
                 return found;
         }
         return null;
     }
+
+    // ========== SPOT SYSTEM ==========
 
     public int GetNearestSpotIndex(Vector3 worldPosition, Item self = null)
     {
@@ -120,6 +132,7 @@ public class Cell : MonoBehaviour
                 nearestIndex = i;
             }
         }
+
         return nearestIndex;
     }
 
@@ -127,6 +140,7 @@ public class Cell : MonoBehaviour
     {
         if (spotIndex < 0 || spotIndex >= maxItems)
             return itemContainer.position;
+
         return itemContainer.TransformPoint(spotPositions[spotIndex]);
     }
 
@@ -134,6 +148,7 @@ public class Cell : MonoBehaviour
     {
         if (spotIndex < 0 || spotIndex >= maxItems)
             return false;
+
         return spots[spotIndex] == null;
     }
 
@@ -141,9 +156,13 @@ public class Cell : MonoBehaviour
     {
         int count = 0;
         for (int i = 0; i < maxItems; i++)
+        {
             if (spots[i] == null) count++;
+        }
         return count;
     }
+
+    // ========== ITEM MANAGEMENT ==========
 
     public bool CanAcceptItem(Item item)
     {
@@ -158,8 +177,10 @@ public class Cell : MonoBehaviour
     public bool AddItemAtPosition(Item item, Vector3 dropPosition)
     {
         int spotIndex = GetNearestSpotIndex(dropPosition, item);
+
         if (spotIndex < 0)
             return false;
+
         return AddItemToSpot(item, spotIndex);
     }
 
@@ -172,44 +193,115 @@ public class Cell : MonoBehaviour
             return false;
 
         // LƯU SCALE TRƯỚC
-        Vector3 savedScale = item.transform.localScale;
+        Vector3 worldScale = item.transform.lossyScale;
 
         spots[spotIndex] = item;
         item.SetCell(this);
         item.SetSpotIndex(spotIndex);
 
+        Transform parent = itemContainer != null ? itemContainer : transform;
+        item.transform.SetParent(parent);
+
         PositionItemAtSpot(item, spotIndex);
 
         // KHÔI PHỤC SCALE
-        item.transform.localScale = savedScale;
+        ApplyWorldScale(item.transform, worldScale);
 
         OnItemAdded?.Invoke(this, item);
 
         if (GetEmptySpotCount() == 0)
+        {
             OnCellFull?.Invoke(this);
+        }
 
         return true;
     }
 
-    private void PositionItemAtSpot(Item item, int spotIndex)
+    /// <summary>
+    /// Add item và giữ scale cụ thể
+    /// </summary>
+    public bool AddItemToSpotKeepScale(Item item, int spotIndex, Vector3 worldScale)
     {
-        if (item == null) return;
+        if (spotIndex < 0 || spotIndex >= maxItems)
+            return false;
 
-        Vector3 savedScale = item.transform.localScale;
+        if (spots[spotIndex] != null)
+        {
+            // Tìm spot trống khác
+            spotIndex = GetNearestSpotIndex(item.transform.position, item);
+            if (spotIndex < 0) return false;
+        }
 
-        Vector3 worldPos = GetSpotWorldPosition(spotIndex);
-        item.transform.position = worldPos;
+        spots[spotIndex] = item;
+        item.SetCell(this);
+        item.SetSpotIndex(spotIndex);
 
         Transform parent = itemContainer != null ? itemContainer : transform;
-        item.transform.SetParent(parent, true);
+        item.transform.SetParent(parent);
+
+        PositionItemAtSpot(item, spotIndex);
 
         // KHÔI PHỤC SCALE
-        item.transform.localScale = savedScale;
+        ApplyWorldScale(item.transform, worldScale);
+
+        OnItemAdded?.Invoke(this, item);
+
+        if (GetEmptySpotCount() == 0)
+        {
+            OnCellFull?.Invoke(this);
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Add item tại vị trí và giữ scale
+    /// </summary>
+    public bool AddItemAtPositionKeepScale(Item item, Vector3 dropPosition, Vector3 worldScale)
+    {
+        int spotIndex = GetNearestSpotIndex(dropPosition, item);
+
+        if (spotIndex < 0)
+            return false;
+
+        return AddItemToSpotKeepScale(item, spotIndex, worldScale);
+    }
+
+    private void ApplyWorldScale(Transform t, Vector3 worldScale)
+    {
+        if (t.parent == null)
+        {
+            t.localScale = worldScale;
+        }
+        else
+        {
+            Vector3 parentScale = t.parent.lossyScale;
+            t.localScale = new Vector3(
+                worldScale.x / parentScale.x,
+                worldScale.y / parentScale.y,
+                worldScale.z / parentScale.z
+            );
+        }
+    }
+
+    private void PositionItemAtSpot(Item item, int spotIndex)
+    {
+        Vector3 localPos = spotPositions[spotIndex];
+
+        SpriteRenderer sr = item.GetComponent<SpriteRenderer>();
+        if (sr != null && sr.sprite != null)
+        {
+            float spriteHeight = sr.bounds.size.y;
+            float pivotOffsetY = sr.bounds.center.y - item.transform.position.y;
+            localPos.y += (spriteHeight / 2f) - pivotOffsetY;
+        }
+
+        item.transform.localPosition = localPos;
 
         if (tiltItems)
+        {
             item.transform.localRotation = Quaternion.Euler(tiltAngleX, 0f, 0f);
-        else
-            item.transform.localRotation = Quaternion.identity;
+        }
     }
 
     public bool RemoveItem(Item item)
@@ -219,11 +311,35 @@ public class Cell : MonoBehaviour
             if (spots[i] == item)
             {
                 spots[i] = null;
-
-                Vector3 savedScale = item.transform.localScale;
-                item.transform.SetParent(null, true);
+                item.transform.SetParent(null);
                 item.SetSpotIndex(-1);
-                item.transform.localScale = savedScale;
+
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Remove item nhưng giữ scale
+    /// </summary>
+    public bool RemoveItemKeepScale(Item item)
+    {
+        for (int i = 0; i < maxItems; i++)
+        {
+            if (spots[i] == item)
+            {
+                spots[i] = null;
+
+                // LƯU SCALE TRƯỚC
+                Vector3 worldScale = item.transform.lossyScale;
+
+                item.transform.SetParent(null);
+
+                // KHÔI PHỤC SCALE
+                item.transform.localScale = worldScale;
+
+                item.SetSpotIndex(-1);
 
                 return true;
             }
@@ -235,7 +351,7 @@ public class Cell : MonoBehaviour
     {
         if (GetItemCount() == 0)
         {
-            Debug.Log("[Cell] " + name + " is now empty");
+            Debug.Log($"[Cell] {name} is now empty after item moved to other cell");
             OnCellEmpty?.Invoke(this);
         }
     }
@@ -243,7 +359,9 @@ public class Cell : MonoBehaviour
     public void CheckEmpty()
     {
         if (GetItemCount() == 0)
+        {
             OnCellEmpty?.Invoke(this);
+        }
     }
 
     public void ClearItems()
@@ -256,19 +374,27 @@ public class Cell : MonoBehaviour
                 spots[i] = null;
             }
         }
+
         OnCellEmpty?.Invoke(this);
     }
+
+    // ========== VISUAL FEEDBACK ==========
 
     public void SetHighlight(bool active, bool isValid = true)
     {
         if (highlightObject != null)
         {
             highlightObject.SetActive(active);
+
             SpriteRenderer sr = highlightObject.GetComponent<SpriteRenderer>();
             if (sr != null)
+            {
                 sr.color = isValid ? validDropColor : invalidDropColor;
+            }
         }
     }
+
+    // ========== SORTING CHECK ==========
 
     public bool IsSorted()
     {
@@ -277,27 +403,46 @@ public class Cell : MonoBehaviour
             return true;
 
         string firstType = items[0].itemType;
+
         foreach (var item in items)
+        {
             if (item.itemType != firstType)
                 return false;
+        }
+
         return true;
     }
 
-    public bool IsFull() => GetEmptySpotCount() == 0;
-    public bool IsFullAndSorted() => IsFull() && IsSorted();
+    public bool IsFull()
+    {
+        return GetEmptySpotCount() == 0;
+    }
+
+    public bool IsFullAndSorted()
+    {
+        return IsFull() && IsSorted();
+    }
 
     public void CheckSorted()
     {
         if (IsFullAndSorted())
+        {
             OnCellSorted?.Invoke(this);
+        }
     }
+
+    // ========== GETTERS ==========
 
     public List<Item> GetItems()
     {
         List<Item> items = new List<Item>();
         for (int i = 0; i < maxItems; i++)
+        {
             if (spots[i] != null)
+            {
                 items.Add(spots[i]);
+            }
+        }
         return items;
     }
 
@@ -305,7 +450,9 @@ public class Cell : MonoBehaviour
     {
         int count = 0;
         for (int i = 0; i < maxItems; i++)
+        {
             if (spots[i] != null) count++;
+        }
         return count;
     }
 
@@ -319,17 +466,23 @@ public class Cell : MonoBehaviour
     public Vector3 GetNextItemPosition()
     {
         for (int i = 0; i < maxItems; i++)
+        {
             if (spots[i] == null)
+            {
                 return GetSpotWorldPosition(i);
+            }
+        }
         return itemContainer.position;
     }
 
     public string GetDominantItemType()
     {
         List<Item> items = GetItems();
-        if (items.Count == 0) return null;
+        if (items.Count == 0)
+            return null;
 
         Dictionary<string, int> typeCounts = new Dictionary<string, int>();
+
         foreach (var item in items)
         {
             if (!typeCounts.ContainsKey(item.itemType))
@@ -339,6 +492,7 @@ public class Cell : MonoBehaviour
 
         string dominant = null;
         int maxCount = 0;
+
         foreach (var kvp in typeCounts)
         {
             if (kvp.Value > maxCount)
@@ -347,16 +501,23 @@ public class Cell : MonoBehaviour
                 dominant = kvp.Key;
             }
         }
+
         return dominant;
     }
+
+    // ========== LAYER SYSTEM ==========
 
     public void UseLayer()
     {
         if (currentLayer <= 0) return;
+
         currentLayer--;
         OnLayerUsed?.Invoke(this);
+
         if (currentLayer <= 0)
+        {
             OnLayerDepleted?.Invoke(this);
+        }
     }
 
     public bool HasLayersRemaining() => currentLayer > 0;
@@ -385,10 +546,12 @@ public class Cell : MonoBehaviour
         if (spotPositions == null || spotPositions.Length == 0)
         {
             Vector3 startPos = startSpot != null ? startSpot.localPosition : Vector3.zero;
+
             for (int i = 0; i < maxItems; i++)
             {
                 Vector3 offset = arrangeHorizontal ? new Vector3(i * spotSpacing, 0, 0) : new Vector3(0, -i * spotSpacing, 0);
                 Vector3 pos = transform.TransformPoint(startPos + offset);
+
                 Gizmos.color = Color.yellow;
                 Gizmos.DrawWireSphere(pos, 0.1f);
             }
@@ -398,7 +561,7 @@ public class Cell : MonoBehaviour
             for (int i = 0; i < maxItems; i++)
             {
                 Vector3 pos = GetSpotWorldPosition(i);
-                Gizmos.color = spots[i] != null ? Color.red : Color.green;
+                Gizmos.color = spots != null && spots[i] != null ? Color.red : Color.green;
                 Gizmos.DrawWireSphere(pos, 0.1f);
             }
         }
