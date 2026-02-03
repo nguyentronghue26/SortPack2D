@@ -15,7 +15,7 @@ public class Item : MonoBehaviour
     private bool isDragging = false;
     private Vector3 originalPosition;
     private float originalZ;
-    private Vector3 originalScale;  // LƯU SCALE GỐC
+    private Vector3 originalScale;
 
     // References
     private Camera mainCamera;
@@ -24,10 +24,8 @@ public class Item : MonoBehaviour
     private Collider2D itemCollider;
     private ItemAnimator itemAnimator;
 
-    // Cache cell gốc khi bắt đầu drag
     private Cell dragStartCell;
 
-    // Events
     public System.Action<Item> OnItemPickedUp;
     public System.Action<Item, Cell> OnItemDropped;
 
@@ -37,9 +35,7 @@ public class Item : MonoBehaviour
         itemCollider = GetComponent<Collider2D>();
         itemAnimator = GetComponent<ItemAnimator>();
         originalZ = transform.position.z;
-
-        // LƯU SCALE LÚC START
-        originalScale = transform.lossyScale;  // World scale
+        originalScale = transform.lossyScale;
     }
 
     void Update()
@@ -68,9 +64,7 @@ public class Item : MonoBehaviour
                 dragSpeed * Time.deltaTime
             );
 
-            // GIỮ SCALE KHI DRAG
             ApplyOriginalScale();
-
             CheckHoveredCell();
         }
     }
@@ -79,16 +73,23 @@ public class Item : MonoBehaviour
     {
         Vector3 mouseWorld = GetMouseWorldPosition();
 
-        RaycastHit2D hit = Physics2D.Raycast(mouseWorld, Vector2.zero);
+        // LẤY TẤT CẢ COLLIDER TẠI VỊ TRÍ CHUỘT
+        RaycastHit2D[] hits = Physics2D.RaycastAll(mouseWorld, Vector2.zero);
 
-        if (hit.collider != null && hit.collider.gameObject == gameObject)
+        // TÌM ITEM TRƯỚC (ưu tiên Item hơn Cell)
+        foreach (var hit in hits)
         {
-            StartDrag();
+            if (hit.collider != null && hit.collider.gameObject == gameObject)
+            {
+                StartDrag();
+                return;
+            }
         }
     }
 
     void OnMouseDown()
     {
+        // OnMouseDown vẫn hoạt động nếu Item ở trên Cell
         StartDrag();
     }
 
@@ -103,25 +104,21 @@ public class Item : MonoBehaviour
 
         isDragging = true;
         originalPosition = transform.position;
-
-        // LƯU SCALE TRƯỚC KHI TÁCH PARENT
         originalScale = transform.lossyScale;
-
-        // Cache cell gốc trước khi drag
         dragStartCell = currentCell;
 
-        // TÁCH KHỎI PARENT NHƯNG GIỮ SCALE
+        // Tách khỏi parent
         transform.SetParent(null);
         ApplyOriginalScale();
 
         if (itemAnimator != null)
         {
             itemAnimator.StopIdleAnimation();
-            // Không gọi PlayPickUp() để tránh scale animation
         }
 
         SetSortingOrder(100);
 
+        // TẮT COLLIDER KHI DRAG để không chặn raycast tìm Cell
         if (itemCollider != null)
             itemCollider.enabled = false;
 
@@ -134,6 +131,7 @@ public class Item : MonoBehaviour
 
         isDragging = false;
 
+        // BẬT LẠI COLLIDER
         if (itemCollider != null)
             itemCollider.enabled = true;
 
@@ -144,7 +142,6 @@ public class Item : MonoBehaviour
         {
             if (hoveredCell == currentCell)
             {
-                // Cùng cell - đổi spot
                 int newSpotIndex = hoveredCell.GetNearestSpotIndex(transform.position);
                 if (newSpotIndex >= 0 && newSpotIndex != spotIndex)
                 {
@@ -155,7 +152,6 @@ public class Item : MonoBehaviour
             }
             else if (hoveredCell.CanAcceptItem(this))
             {
-                // Khác cell - di chuyển item sang cell mới
                 if (currentCell != null)
                 {
                     currentCell.RemoveItemKeepScale(this);
@@ -183,17 +179,16 @@ public class Item : MonoBehaviour
         }
         else
         {
-            // Trả về vị trí cũ
+            // Trả về cell cũ
             if (dragStartCell != null)
             {
-                dragStartCell.AddItemToSpotKeepScale(this, spotIndex >= 0 ? spotIndex : 0, originalScale);
+                int returnSpot = spotIndex >= 0 ? spotIndex : dragStartCell.GetNearestSpotIndex(originalPosition);
+                dragStartCell.AddItemToSpotKeepScale(this, returnSpot, originalScale);
             }
             SnapToPosition(originalPosition);
         }
 
-        // ĐẢM BẢO SCALE ĐÚNG SAU KHI DROP
         ApplyOriginalScale();
-
         SetSortingOrder(0);
 
         if (hoveredCell != null)
@@ -203,18 +198,14 @@ public class Item : MonoBehaviour
         }
     }
 
-    // ========== HELPER METHODS ==========
-
     private void ApplyOriginalScale()
     {
-        // Nếu không có parent, localScale = lossyScale
         if (transform.parent == null)
         {
             transform.localScale = originalScale;
         }
         else
         {
-            // Nếu có parent, cần tính toán localScale để lossyScale = originalScale
             Vector3 parentScale = transform.parent.lossyScale;
             transform.localScale = new Vector3(
                 originalScale.x / parentScale.x,
@@ -235,6 +226,7 @@ public class Item : MonoBehaviour
     {
         Vector3 mouseWorld = GetMouseWorldPosition();
 
+        // Raycast tìm Cell
         RaycastHit2D[] hits = Physics2D.RaycastAll(mouseWorld, Vector2.zero);
 
         Cell foundCell = null;
@@ -243,6 +235,7 @@ public class Item : MonoBehaviour
         {
             if (hit.collider == null) continue;
 
+            // Tìm Cell
             Cell cell = hit.collider.GetComponent<Cell>();
             if (cell != null)
             {
@@ -251,33 +244,19 @@ public class Item : MonoBehaviour
             }
         }
 
-        if (foundCell != null)
+        if (foundCell != hoveredCell)
         {
-            if (hoveredCell != null && hoveredCell != foundCell)
-            {
+            if (hoveredCell != null)
                 hoveredCell.SetHighlight(false);
-            }
 
             hoveredCell = foundCell;
 
-            bool canAccept = false;
-            if (foundCell == currentCell)
-            {
-                canAccept = foundCell.GetEmptySpotCount() > 0;
-            }
-            else
-            {
-                canAccept = foundCell.CanAcceptItem(this);
-            }
-
-            hoveredCell.SetHighlight(canAccept);
-        }
-        else
-        {
             if (hoveredCell != null)
             {
-                hoveredCell.SetHighlight(false);
-                hoveredCell = null;
+                bool canAccept = (hoveredCell == currentCell)
+                    ? hoveredCell.GetEmptySpotCount() > 0
+                    : hoveredCell.CanAcceptItem(this);
+                hoveredCell.SetHighlight(canAccept);
             }
         }
     }
@@ -292,7 +271,7 @@ public class Item : MonoBehaviour
         while (Vector3.Distance(transform.position, target) > 0.01f)
         {
             transform.position = Vector3.Lerp(transform.position, target, snapSpeed * Time.deltaTime);
-            ApplyOriginalScale();  // Giữ scale trong lúc snap
+            ApplyOriginalScale();
             yield return null;
         }
         transform.position = target;
@@ -308,49 +287,12 @@ public class Item : MonoBehaviour
         }
     }
 
-    // ========== PUBLIC METHODS ==========
-
-    public void SetCell(Cell cell)
-    {
-        currentCell = cell;
-    }
-
-    public Cell GetCurrentCell()
-    {
-        return currentCell;
-    }
-
-    public void Initialize(string type, int id)
-    {
-        itemType = type;
-        itemID = id;
-    }
-
-    public ItemAnimator GetAnimator()
-    {
-        return itemAnimator;
-    }
-
-    public void SetSpotIndex(int index)
-    {
-        spotIndex = index;
-    }
-
-    public int GetSpotIndex()
-    {
-        return spotIndex;
-    }
-
-    /// <summary>
-    /// Gọi sau khi spawn để lưu scale gốc
-    /// </summary>
-    public void SaveOriginalScale()
-    {
-        originalScale = transform.lossyScale;
-    }
-
-    public Vector3 GetOriginalScale()
-    {
-        return originalScale;
-    }
+    public void SetCell(Cell cell) => currentCell = cell;
+    public Cell GetCurrentCell() => currentCell;
+    public void Initialize(string type, int id) { itemType = type; itemID = id; }
+    public ItemAnimator GetAnimator() => itemAnimator;
+    public void SetSpotIndex(int index) => spotIndex = index;
+    public int GetSpotIndex() => spotIndex;
+    public void SaveOriginalScale() => originalScale = transform.lossyScale;
+    public Vector3 GetOriginalScale() => originalScale;
 }
