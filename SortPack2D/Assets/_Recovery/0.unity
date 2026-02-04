@@ -2387,6 +2387,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1793123926}
   - component: {fileID: 1793123925}
+  - component: {fileID: 1793123927}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -2433,6 +2434,31 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1793123927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1793123924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ada89c81156c5346aa1f10b8a04b125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  cellCloseEndPrefab: {fileID: 0}
+  spawnOffset: {x: 0, y: 0, z: -0.1}
+  delayBeforeClose: 0.1
+  stayClosedDuration: 0.5
+  delayBeforeFly: 0.1
+  openDoorAfterClear: 1
+  flyZOffset: -2
+  flyDuration: 0.3
+  slideDuration: 0.4
+  slideDistance: 10
+  flyEase: 6
+  slideEase: 5
+  flyAwaySound: {fileID: 0}
 --- !u!1 &1848414498
 GameObject:
   m_ObjectHideFlags: 0
