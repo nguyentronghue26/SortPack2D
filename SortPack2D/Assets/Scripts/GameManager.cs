@@ -837,6 +837,7 @@ public class GameManager : MonoBehaviour
 
         DisableItemTypeCompletely(matchedItemType);
 
+
         yield return new WaitForSeconds(0.5f);
         CheckWinCondition();
     }

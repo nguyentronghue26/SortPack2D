@@ -346,7 +346,21 @@ public class Cell : MonoBehaviour
         }
         return false;
     }
-
+    public bool RemoveItemWithoutNotify(Item item)
+    {
+        for (int i = 0; i < maxItems; i++)
+        {
+            if (spots[i] == item)
+            {
+                spots[i] = null;
+                item.SetCell(null);
+                item.SetSpotIndex(-1);
+                // KHÔNG gọi OnCellEmpty
+                return true;
+            }
+        }
+        return false;
+    }
     public void NotifyItemMovedToOtherCell()
     {
         if (GetItemCount() == 0)
