@@ -25,6 +25,9 @@ public class CountdownTimer : MonoBehaviour
     [SerializeField] private float heartbeatDuration = 0.5f;   // Mỗi nhịp 0.5s (1 giây = 2 nhịp)
     [SerializeField] private Ease heartbeatEaseIn = Ease.OutQuad;
     [SerializeField] private Ease heartbeatEaseOut = Ease.InQuad;
+    [Header("Freeze Time FX (băng khi dùng booster)")]
+    [SerializeField] private GameObject freezeFxObject;  // object băng
+    [SerializeField] private Animator freezeFxAnimator;  // animator của băng
 
     // State
     private float currentTime;
@@ -56,6 +59,23 @@ public class CountdownTimer : MonoBehaviour
         if (startOnAwake)
         {
             StartTimer();
+        }
+    }
+    void OnEnable()
+    {
+        if (BoosterManager.Instance != null)
+        {
+            BoosterManager.Instance.OnFreeTimeStarted += HandleFreeTimeStart;
+            BoosterManager.Instance.OnFreeTimeEnded += HandleFreeTimeEnd;
+        }
+    }
+
+    void OnDisable()
+    {
+        if (BoosterManager.Instance != null)
+        {
+            BoosterManager.Instance.OnFreeTimeStarted -= HandleFreeTimeStart;
+            BoosterManager.Instance.OnFreeTimeEnded -= HandleFreeTimeEnd;
         }
     }
 
@@ -256,4 +276,38 @@ public class CountdownTimer : MonoBehaviour
 
         UpdateTimerDisplay();
     }
+
+
+    private void HandleFreeTimeStart(float duration)
+    {
+        // Bật FX băng + cho Animator chạy từ đầu
+        if (freezeFxObject != null)
+            freezeFxObject.SetActive(true);
+
+        if (freezeFxAnimator != null)
+        {
+            freezeFxAnimator.enabled = true;
+            freezeFxAnimator.speed = 1f;
+            freezeFxAnimator.Play(0, -1, 0f);  // phát từ frame 0
+        }
+
+       
+    }
+
+    private void HandleFreeTimeEnd()
+    {
+        // Tắt Animator băng + ẩn object
+        if (freezeFxAnimator != null)
+        {
+            freezeFxAnimator.speed = 0f;       // dừng tại frame hiện tại
+                                               // hoặc freezeFxAnimator.enabled = false;
+        }
+
+        if (freezeFxObject != null)
+            freezeFxObject.SetActive(false);
+
+        // Timer lúc này đã ResumeTimer() trong BoosterManager
+    }
+
+
 }

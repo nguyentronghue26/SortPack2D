@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
 
@@ -13,15 +14,20 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] private GameObject settingsPanelPrefab;
     [SerializeField] private GameObject retryPanelPrefab;
 
-    [Header("Star UI")]
-    [SerializeField] private Text starText;   // ⭐ kéo UI text của sao vào đây
-    [SerializeField] private float starIncreaseSpeed = 0.2f;
+    [Header("Options")]
+    [SerializeField] private bool useTimeScalePause = true;
 
-    private int currentStar = 0;
-    private Coroutine starRoutine;
+    [Header("Star UI")]
+    [SerializeField] private Text starText;               // Text thường
+    [SerializeField] private float starAnimDuration = 0.25f;
+    [SerializeField] private AudioClip starGainClip;      // optional – có thì kéo vào
 
     private GameObject settingsPanelInstance;
     private GameObject retryPanelInstance;
+
+    int starCount = 0;
+    int displayedStar = 0;
+    Coroutine starAnimRoutine;
 
     private void Awake()
     {
@@ -31,31 +37,71 @@ public class GameUIManager : MonoBehaviour
             return;
         }
         Instance = this;
+        // Nếu muốn UIManager sống qua nhiều scene:
+        // DontDestroyOnLoad(gameObject);
+
+        // Init star UI
+        if (starText != null)
+            starText.text = "0";
     }
 
-    public void AddStar(int amount)
-    {
-        if (starRoutine != null)
-            StopCoroutine(starRoutine);
+    // ==================== STAR ====================
 
-        starRoutine = StartCoroutine(AnimateStarIncrease(amount));
+    public void AddStars(int baseAmount)
+    {
+        if (baseAmount <= 0) return;
+
+        int finalAmount = baseAmount;
+
+        // Nếu có Double Star booster thì nhân lên
+        if (BoosterManager.Instance != null)
+            finalAmount = BoosterManager.Instance.ApplyStarMultiplier(baseAmount);
+
+        int from = starCount;
+        int to = starCount + finalAmount;
+        starCount = to;
+
+        if (starAnimRoutine != null)
+            StopCoroutine(starAnimRoutine);
+
+        starAnimRoutine = StartCoroutine(AnimateStarCount(from, to));
+
+        // Play sound sao (nếu có clip)
+        if (AudioManager.Instance != null && starGainClip != null)
+            AudioManager.Instance.PlaySFX(starGainClip, 1f, false);
     }
 
-    private IEnumerator AnimateStarIncrease(int amount)
+    IEnumerator AnimateStarCount(int from, int to)
     {
-        for (int i = 0; i < amount; i++)
+        if (starText == null)
+            yield break;
+
+        float t = 0f;
+        displayedStar = from;
+
+        while (t < starAnimDuration)
         {
-            currentStar++;
-            if (starText != null)
-                starText.text = currentStar.ToString();
+            // dùng unscaled để không phụ thuộc Time.timeScale
+            t += Time.unscaledDeltaTime;
+            float lerp = Mathf.Clamp01(t / starAnimDuration);
+            int current = Mathf.RoundToInt(Mathf.Lerp(from, to, lerp));
 
-            yield return new WaitForSeconds(starIncreaseSpeed);
+            if (current != displayedStar)
+            {
+                displayedStar = current;
+                starText.text = displayedStar.ToString();
+            }
+
+            yield return null;
         }
+
+        displayedStar = to;
+        starText.text = displayedStar.ToString();
     }
 
-    // ====================
-    // CODE CŨ GIỮ NGUYÊN
-    // ====================
+    public int GetStarCount() => starCount;
+
+    // ==================== SETTINGS ====================
 
     public void OnSettingsButtonClicked()
     {
@@ -66,8 +112,10 @@ public class GameUIManager : MonoBehaviour
                 Debug.LogWarning("[GameUIManager] Chưa gán SettingsPanelPrefab hoặc CanvasTransform");
                 return;
             }
+
             settingsPanelInstance = Instantiate(settingsPanelPrefab, canvasTransform);
         }
+
         settingsPanelInstance.SetActive(true);
         SetPause(true);
         PlayClickSfx();
@@ -76,17 +124,27 @@ public class GameUIManager : MonoBehaviour
     public void OnSettingsCloseClicked()
     {
         if (settingsPanelInstance == null) return;
+
         settingsPanelInstance.SetActive(false);
         SetPause(false);
         PlayClickSfx();
     }
 
+    // ==================== RETRY PANEL ====================
+
     public void ShowRetryPanel()
     {
         if (retryPanelInstance == null)
         {
+            if (retryPanelPrefab == null || canvasTransform == null)
+            {
+                Debug.LogWarning("[GameUIManager] Chưa gán RetryPanelPrefab hoặc CanvasTransform");
+                return;
+            }
+
             retryPanelInstance = Instantiate(retryPanelPrefab, canvasTransform);
         }
+
         retryPanelInstance.SetActive(true);
         SetPause(true);
         PlayClickSfx();
@@ -96,15 +154,16 @@ public class GameUIManager : MonoBehaviour
     {
         SetPause(false);
         PlayClickSfx();
-        var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
-        UnityEngine.SceneManagement.SceneManager.LoadScene(scene.buildIndex);
+
+        Scene current = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(current.buildIndex);
     }
 
     public void OnRetryHomeClicked()
     {
         SetPause(false);
         PlayClickSfx();
-        UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene("MainMenu");
     }
 
     public void OnRetryCloseClicked()
@@ -116,8 +175,11 @@ public class GameUIManager : MonoBehaviour
         PlayClickSfx();
     }
 
+    // ==================== HELPER ====================
+
     private void SetPause(bool pause)
     {
+        if (!useTimeScalePause) return;
         Time.timeScale = pause ? 0f : 1f;
     }
 

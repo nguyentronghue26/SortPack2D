@@ -396,16 +396,34 @@ public class LockedCell : MonoBehaviour
     {
         if (lockIcon != null)
         {
-            // Dùng vị trí gốc từ prefab thay vì Vector3.zero
             lockIcon.transform.localPosition = lockIconOriginalLocalPos;
             lockIcon.transform.localScale = Vector3.one;
             lockIcon.transform.localRotation = Quaternion.identity;
+            SetAlpha(lockIcon, 1f);   // 🔹 reset alpha
         }
 
         if (lockContainer != null)
         {
             lockContainer.transform.localPosition = lockContainerOriginalLocalPos;
             lockContainer.transform.localScale = Vector3.one;
+            SetAlpha(lockContainer, 1f); // 🔹 reset alpha
+        }
+    }
+
+    // Helper reset alpha cho tất cả renderer con
+    private void SetAlpha(GameObject go, float alpha)
+    {
+        if (go == null) return;
+
+        var renderers = go.GetComponentsInChildren<Renderer>(true);
+        foreach (var r in renderers)
+        {
+            foreach (var mat in r.materials)
+            {
+                Color c = mat.color;
+                c.a = alpha;
+                mat.color = c;
+            }
         }
     }
 
@@ -415,30 +433,49 @@ public class LockedCell : MonoBehaviour
     {
         isAnimating = true;
 
-        // 🔊 PHÁT SOUND UNLOCK
+        // 🔊 SOUND
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayUnlock();
 
+        float fadeDuration = 0.35f;
+
         Sequence seq = DOTween.Sequence();
 
+        // Nhẹ nhàng scale xuống một tí (ko xoay nữa)
+        if (lockContainer != null)
+            seq.Join(lockContainer.transform.DOScale(0.8f, fadeDuration).SetEase(Ease.OutQuad));
+
+        if (lockIcon != null)
+            seq.Join(lockIcon.transform.DOScale(0.8f, fadeDuration).SetEase(Ease.OutQuad));
+
+        // 🔹 Fade mờ dần toàn bộ renderer của lockIcon + lockContainer
         if (lockIcon != null)
         {
-            Vector3 originalPos = lockIcon.transform.localPosition;
-
-            seq.Append(lockIcon.transform.DOShakeRotation(0.15f, new Vector3(0, 0, 20), 15, 90));
-            seq.Append(lockIcon.transform.DOLocalMoveY(originalPos.y + 0.8f, 0.25f).SetEase(Ease.OutQuad));
-            seq.Join(lockIcon.transform.DOScale(0f, 0.25f).SetEase(Ease.InBack));
-            seq.Join(lockIcon.transform.DOLocalRotate(new Vector3(0, 0, 180), 0.25f, RotateMode.LocalAxisAdd));
+            var renderers = lockIcon.GetComponentsInChildren<Renderer>(true);
+            foreach (var r in renderers)
+            {
+                foreach (var mat in r.materials)
+                {
+                    seq.Join(mat.DOFade(0f, fadeDuration));
+                }
+            }
         }
 
         if (lockContainer != null)
         {
-            seq.Insert(0.1f, lockContainer.transform.DOShakeScale(0.15f, 0.1f, 10, 90));
-            seq.Insert(0.25f, lockContainer.transform.DOScale(0f, 0.2f).SetEase(Ease.InBack));
+            var renderers = lockContainer.GetComponentsInChildren<Renderer>(true);
+            foreach (var r in renderers)
+            {
+                foreach (var mat in r.materials)
+                {
+                    seq.Join(mat.DOFade(0f, fadeDuration));
+                }
+            }
         }
 
         seq.OnComplete(() =>
         {
+            // Sau khi mờ xong mới unlock
             Unlock();
             isAnimating = false;
         });

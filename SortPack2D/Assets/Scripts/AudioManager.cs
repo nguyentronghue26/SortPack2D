@@ -115,7 +115,7 @@ public class AudioManager : MonoBehaviour
     public void PlayMerge(int comboCount = 1)
     {
         if (GameUIManager.Instance != null)
-            GameUIManager.Instance.AddStar(2);
+            //GameUIManager.Instance.AddStar(2);
 
         if (comboSounds != null && comboSounds.Length > 0 && comboCount > 1)
         {

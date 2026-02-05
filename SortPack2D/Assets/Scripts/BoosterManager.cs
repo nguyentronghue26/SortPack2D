@@ -25,6 +25,10 @@ public class BoosterManager : MonoBehaviour
     [Header("=== FREE TIME CONFIG ===")]
     [SerializeField] private float freeTimeDuration = 5f;
 
+    [Header("FreezeTime FX")]
+    [SerializeField] private Animator freezeTimeAnimator;      // <-- KÉO Animator của băng vào đây
+    [SerializeField] private string freezeTimeStateName = "FreezeTime";
+
     [Header("=== DOUBLE STAR CONFIG ===")]
     [SerializeField] private float doubleStarDuration = 10f;
     [SerializeField] private int starMultiplier = 2;
@@ -39,14 +43,12 @@ public class BoosterManager : MonoBehaviour
     [SerializeField] private CountdownTimer countdownTimer;
     [SerializeField] private GridSpawner gridSpawner;
 
-    // States
-    private bool isFreeTimeActive = false;
-    private bool isDoubleStarActive = false;
-    private bool isAutoMerging = false;
-    private Coroutine freeTimeCoroutine;
-    private Coroutine doubleStarCoroutine;
+    bool isFreeTimeActive = false;
+    bool isDoubleStarActive = false;
+    bool isAutoMerging = false;
+    Coroutine freeTimeCoroutine;
+    Coroutine doubleStarCoroutine;
 
-    // Events
     public System.Action<BoosterType, int> OnBoosterCountChanged;
     public System.Action<BoosterType> OnBoosterUsed;
     public System.Action<BoosterType> OnBoosterFailed;
@@ -75,6 +77,9 @@ public class BoosterManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
+        // Lúc đầu không chạy băng
+        SetFreezeAnimActive(false);
     }
 
     void Start()
@@ -154,7 +159,6 @@ public class BoosterManager : MonoBehaviour
         OnBoosterCountChanged?.Invoke(BoosterType.FreeTime, freeTimeCount);
         OnBoosterUsed?.Invoke(BoosterType.FreeTime);
 
-        // Play booster sound
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayPickUp();
 
@@ -164,12 +168,15 @@ public class BoosterManager : MonoBehaviour
         freeTimeCoroutine = StartCoroutine(FreeTimeCoroutine());
     }
 
-    private IEnumerator FreeTimeCoroutine()
+    IEnumerator FreeTimeCoroutine()
     {
         isFreeTimeActive = true;
 
         if (countdownTimer != null)
             countdownTimer.PauseTimer();
+
+        // Bắt đầu chạy anim băng
+        SetFreezeAnimActive(true);
 
         OnFreeTimeStarted?.Invoke(freeTimeDuration);
 
@@ -185,10 +192,29 @@ public class BoosterManager : MonoBehaviour
             countdownTimer.ResumeTimer();
 
         isFreeTimeActive = false;
+
+        // Dừng anim băng, giữ background lại
+        SetFreezeAnimActive(false);
+
         OnFreeTimeEnded?.Invoke();
     }
 
     public bool IsFreeTimeActive() => isFreeTimeActive;
+
+    void SetFreezeAnimActive(bool active)
+    {
+        if (freezeTimeAnimator == null) return;
+
+        if (active)
+        {
+            freezeTimeAnimator.enabled = true;
+            freezeTimeAnimator.Play(freezeTimeStateName, 0, 0f);
+        }
+        else
+        {
+            freezeTimeAnimator.enabled = false;
+        }
+    }
 
     // ==================== 2. AUTO MERGE ====================
 
@@ -217,7 +243,7 @@ public class BoosterManager : MonoBehaviour
         StartCoroutine(PerformAutoMerge(itemsToMerge));
     }
 
-    private List<Item> FindThreeSameTypeItems()
+    List<Item> FindThreeSameTypeItems()
     {
         List<Item> allItems = GetAllItems();
         if (allItems.Count < 3) return null;
@@ -260,25 +286,22 @@ public class BoosterManager : MonoBehaviour
         return itemsByType[bestType].Take(3).ToList();
     }
 
-    private IEnumerator PerformAutoMerge(List<Item> items)
+    IEnumerator PerformAutoMerge(List<Item> items)
     {
         isAutoMerging = true;
         OnAutoMergeStarted?.Invoke(items);
 
-        // Tính center
         Vector3 centerPos = Vector3.zero;
         foreach (var item in items)
             centerPos += item.transform.position;
         centerPos /= items.Count;
 
-        // Disable colliders
         foreach (var item in items)
         {
             var col = item.GetComponent<Collider2D>();
             if (col != null) col.enabled = false;
         }
 
-        // Remove từ cells
         foreach (var item in items)
         {
             Cell cell = item.GetCurrentCell();
@@ -287,7 +310,6 @@ public class BoosterManager : MonoBehaviour
             item.transform.SetParent(null);
         }
 
-        // Animation: Bay về center
         Sequence moveSeq = DOTween.Sequence();
         foreach (var item in items)
         {
@@ -297,11 +319,9 @@ public class BoosterManager : MonoBehaviour
 
         yield return moveSeq.WaitForCompletion();
 
-        // *** PLAY MERGE SOUND ***
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayMerge();
 
-        // Animation: Scale về 0
         Sequence scaleSeq = DOTween.Sequence();
         foreach (var item in items)
         {
@@ -310,19 +330,14 @@ public class BoosterManager : MonoBehaviour
 
         yield return scaleSeq.WaitForCompletion();
 
-        // Destroy
         foreach (var item in items)
         {
             if (item != null)
                 Destroy(item.gameObject);
         }
 
-        // *** TÍNH ĐIỂM VỚI X2 NẾU DOUBLE STAR ACTIVE ***
         int score = mergeBaseScore;
         score = ApplyStarMultiplier(score);
-
-        // TODO: Gọi GameManager để cộng điểm
-        // GameManager.Instance?.AddScore(score);
 
         Debug.Log($"[BoosterManager] AutoMerge complete! Score: {score} (x2: {isDoubleStarActive})");
 
@@ -355,7 +370,7 @@ public class BoosterManager : MonoBehaviour
         doubleStarCoroutine = StartCoroutine(DoubleStarCoroutine());
     }
 
-    private IEnumerator DoubleStarCoroutine()
+    IEnumerator DoubleStarCoroutine()
     {
         isDoubleStarActive = true;
         OnDoubleStarStarted?.Invoke();
@@ -376,10 +391,6 @@ public class BoosterManager : MonoBehaviour
         Debug.Log("[BoosterManager] DoubleStar ENDED!");
     }
 
-    /// <summary>
-    /// Gọi method này để tính điểm với x2 multiplier
-    /// GameManager nên gọi method này khi tính score
-    /// </summary>
     public int ApplyStarMultiplier(int baseScore)
     {
         if (isDoubleStarActive)
@@ -442,7 +453,7 @@ public class BoosterManager : MonoBehaviour
         StartCoroutine(PerformSwap(item1, item2));
     }
 
-    private IEnumerator PerformSwap(Item item1, Item item2)
+    IEnumerator PerformSwap(Item item1, Item item2)
     {
         Cell cell1 = item1.GetCurrentCell();
         Cell cell2 = item2.GetCurrentCell();
@@ -489,7 +500,7 @@ public class BoosterManager : MonoBehaviour
 
     // ==================== HELPERS ====================
 
-    private List<Item> GetAllItems()
+    List<Item> GetAllItems()
     {
         List<Item> items = new List<Item>();
 

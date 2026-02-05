@@ -212,14 +212,13 @@ public class Cell : MonoBehaviour
         if (GetEmptySpotCount() == 0)
         {
             OnCellFull?.Invoke(this);
+            // ⭐ Khi cell vừa full thì check luôn xem có sorted không
+            CheckSorted();
         }
 
         return true;
     }
 
-    /// <summary>
-    /// Add item và giữ scale cụ thể
-    /// </summary>
     public bool AddItemToSpotKeepScale(Item item, int spotIndex, Vector3 worldScale)
     {
         if (spotIndex < 0 || spotIndex >= maxItems)
@@ -227,7 +226,6 @@ public class Cell : MonoBehaviour
 
         if (spots[spotIndex] != null)
         {
-            // Tìm spot trống khác
             spotIndex = GetNearestSpotIndex(item.transform.position, item);
             if (spotIndex < 0) return false;
         }
@@ -241,7 +239,6 @@ public class Cell : MonoBehaviour
 
         PositionItemAtSpot(item, spotIndex);
 
-        // KHÔI PHỤC SCALE
         ApplyWorldScale(item.transform, worldScale);
 
         OnItemAdded?.Invoke(this, item);
@@ -249,14 +246,13 @@ public class Cell : MonoBehaviour
         if (GetEmptySpotCount() == 0)
         {
             OnCellFull?.Invoke(this);
+            // ⭐ Cell full thì check sorted
+            CheckSorted();
         }
 
         return true;
     }
 
-    /// <summary>
-    /// Add item tại vị trí và giữ scale
-    /// </summary>
     public bool AddItemAtPositionKeepScale(Item item, Vector3 dropPosition, Vector3 worldScale)
     {
         int spotIndex = GetNearestSpotIndex(dropPosition, item);
@@ -320,9 +316,6 @@ public class Cell : MonoBehaviour
         return false;
     }
 
-    /// <summary>
-    /// Remove item nhưng giữ scale
-    /// </summary>
     public bool RemoveItemKeepScale(Item item)
     {
         for (int i = 0; i < maxItems; i++)
@@ -331,12 +324,10 @@ public class Cell : MonoBehaviour
             {
                 spots[i] = null;
 
-                // LƯU SCALE TRƯỚC
                 Vector3 worldScale = item.transform.lossyScale;
 
                 item.transform.SetParent(null);
 
-                // KHÔI PHỤC SCALE
                 item.transform.localScale = worldScale;
 
                 item.SetSpotIndex(-1);
@@ -346,6 +337,7 @@ public class Cell : MonoBehaviour
         }
         return false;
     }
+
     public bool RemoveItemWithoutNotify(Item item)
     {
         for (int i = 0; i < maxItems; i++)
@@ -355,12 +347,12 @@ public class Cell : MonoBehaviour
                 spots[i] = null;
                 item.SetCell(null);
                 item.SetSpotIndex(-1);
-                // KHÔNG gọi OnCellEmpty
                 return true;
             }
         }
         return false;
     }
+
     public void NotifyItemMovedToOtherCell()
     {
         if (GetItemCount() == 0)
@@ -442,6 +434,11 @@ public class Cell : MonoBehaviour
         if (IsFullAndSorted())
         {
             OnCellSorted?.Invoke(this);
+
+            if (GameUIManager.Instance != null)
+            {
+                GameUIManager.Instance.AddStars(2);
+            }
         }
     }
 

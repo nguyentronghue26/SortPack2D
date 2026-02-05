@@ -136,11 +136,18 @@ public class Item : MonoBehaviour
             itemCollider.enabled = true;
 
         bool dropSuccess = false;
+        bool invalidTarget = false;   
         Cell oldCell = dragStartCell;
 
         if (hoveredCell != null)
         {
-            if (hoveredCell == currentCell)
+            var locked = hoveredCell.GetComponent<LockedCell>();
+            if (locked != null && !locked.CanAcceptItem())
+            {
+
+                invalidTarget = true;
+            }
+            else if (hoveredCell == currentCell)
             {
                 int newSpotIndex = hoveredCell.GetNearestSpotIndex(transform.position);
                 if (newSpotIndex >= 0 && newSpotIndex != spotIndex)
@@ -149,25 +156,46 @@ public class Item : MonoBehaviour
                     currentCell.AddItemToSpotKeepScale(this, newSpotIndex, originalScale);
                     dropSuccess = true;
                 }
+                else
+                {
+                
+                    invalidTarget = true;  
+                }
             }
-            else if (hoveredCell.CanAcceptItem(this))
+            else
             {
-                if (currentCell != null)
+                if (hoveredCell.CanAcceptItem(this))
                 {
-                    currentCell.RemoveItemKeepScale(this);
+                    if (currentCell != null)
+                    {
+                        currentCell.RemoveItemKeepScale(this);
+                    }
+
+                    hoveredCell.AddItemAtPositionKeepScale(this, transform.position, originalScale);
+                    currentCell = hoveredCell;
+                    dropSuccess = true;
+
+                    if (oldCell != null && oldCell != hoveredCell)
+                    {
+                        oldCell.NotifyItemMovedToOtherCell();
+                    }
+
+                    OnItemDropped?.Invoke(this, hoveredCell);
                 }
-
-                hoveredCell.AddItemAtPositionKeepScale(this, transform.position, originalScale);
-                currentCell = hoveredCell;
-                dropSuccess = true;
-
-                if (oldCell != null && oldCell != hoveredCell)
+                else
                 {
-                    oldCell.NotifyItemMovedToOtherCell();
+                 
+                    invalidTarget = true;  
                 }
-
-                OnItemDropped?.Invoke(this, hoveredCell);
             }
+
+            if (!dropSuccess && invalidTarget && AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayInvalidDrop();
+            }
+        }
+        else
+        {
         }
 
         if (dropSuccess)
